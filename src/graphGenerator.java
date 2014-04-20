@@ -3,17 +3,15 @@ import java.util.*;
 import java.io.*;
 
 import org.jgrapht.*;
-import org.jgrapht.experimental.dag.*;
-import org.jgrapht.experimental.dag.DirectedAcyclicGraph.CycleFoundException;
 import org.jgrapht.graph.*;
 
 public class graphGenerator {
 	
-	Graph<String, DefaultEdge> graph;
+	public Graph<String, DefaultEdge> graph;
 	
-	public graphGenerator(String fileAddr, String flag) throws IOException, CycleFoundException{
+	public graphGenerator(String fileAddr, String flag) throws IOException{
 		if(flag == "dag"){
-			graph = createDAG(fileAddr);
+			graph = createDirectedGraph(fileAddr);
 		}else if(flag == "udg"){
 			graph = createUndirectedGraph(fileAddr);
 		}else{
@@ -21,13 +19,13 @@ public class graphGenerator {
 		}
 	}
 	
-	public graphGenerator() throws CycleFoundException{
-		graph = createDAG();
+	public graphGenerator() {
+		graph = createDirectedGraph();
 	}
 	
-	private static DirectedAcyclicGraph<String, DefaultEdge> createDAG() throws CycleFoundException{
-		DirectedAcyclicGraph<String, DefaultEdge> dg =
-	            new DirectedAcyclicGraph<String, DefaultEdge>(DefaultEdge.class);
+	private static DirectedGraph<String, DefaultEdge> createDirectedGraph() {
+		DirectedGraph<String, DefaultEdge> dg =
+	            new DefaultDirectedGraph<String, DefaultEdge>(DefaultEdge.class);
 		
 		// add the vertices
 		dg.addVertex("S1");
@@ -42,28 +40,28 @@ public class graphGenerator {
 		dg.addVertex("T");
 		
 		// add edges 
-		dg.addDagEdge("S1", "A");
-		dg.addDagEdge("S1", "B");
-		dg.addDagEdge("S2", "A");
-		dg.addDagEdge("S3", "A");
-		dg.addDagEdge("S3", "C");
-		dg.addDagEdge("A", "B");
-		dg.addDagEdge("A", "C");
-		dg.addDagEdge("B", "D");
-		dg.addDagEdge("B", "E");
-		dg.addDagEdge("C", "D");
-		dg.addDagEdge("C", "F");
-		dg.addDagEdge("D", "T");
-		dg.addDagEdge("E", "T");
-		dg.addDagEdge("F", "T");
+		dg.addEdge("S1", "A");
+		dg.addEdge("S1", "B");
+		dg.addEdge("S2", "A");
+		dg.addEdge("S3", "A");
+		dg.addEdge("S3", "C");
+		dg.addEdge("A", "B");
+		dg.addEdge("A", "C");
+		dg.addEdge("B", "D");
+		dg.addEdge("B", "E");
+		dg.addEdge("C", "D");
+		dg.addEdge("C", "F");
+		dg.addEdge("D", "T");
+		dg.addEdge("E", "T");
+		dg.addEdge("F", "T");
 
 		return dg;
 		
 	}
 
-	private static DirectedAcyclicGraph<String, DefaultEdge> createDAG(String addr) throws IOException, CycleFoundException{
-		DirectedAcyclicGraph<String, DefaultEdge> dg =
-	            new DirectedAcyclicGraph<String, DefaultEdge>(DefaultEdge.class);
+	private static DirectedGraph<String, DefaultEdge> createDirectedGraph(String addr) throws IOException{
+		DirectedGraph<String, DefaultEdge> dg =
+	            new DefaultDirectedGraph<String, DefaultEdge>(DefaultEdge.class);
 		
 		File fin = new File(addr);
 		
@@ -103,7 +101,7 @@ public class graphGenerator {
 			dg.addVertex(Integer.toString(i));
 		}
 		for(int i = 0; i < sourceVertices.size(); i++){
-			dg.addDagEdge(sourceVertices.get(i), targetVertices.get(i));
+			dg.addEdge(sourceVertices.get(i), targetVertices.get(i));
 		}
 		
 		return dg;
