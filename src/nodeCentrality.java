@@ -4,8 +4,6 @@ import java.io.*;
 
 import org.jgrapht.*;
 import org.jgrapht.alg.DijkstraShortestPath;
-import org.jgrapht.experimental.dag.DirectedAcyclicGraph;
-import org.jgrapht.experimental.dag.DirectedAcyclicGraph.CycleFoundException;
 import org.jgrapht.graph.*;
 import org.jgrapht.traverse.*;
 
@@ -16,30 +14,31 @@ import org.jgrapht.traverse.*;
  *
  */
 public class nodeCentrality {
-	Graph<String, DefaultEdge> graph;
-	Iterator<String> traverseOrder;// may be deleted later
-	Set<String> nodes;
-	Set<String> sourceSet = new HashSet<String>();
-	Set<String> destinationSet = new HashSet<String>();
-	HashMap<String, Integer> impact = new HashMap<String, Integer>();
+	protected Graph<String, DefaultEdge> graph;
+//	private Iterator<String> traverseOrder;// may be deleted later
+	protected Set<String> sourceSet = new HashSet<String>();
+	protected Set<String> destinationSet = new HashSet<String>();
+	private HashMap<String, Integer> impact = new HashMap<String, Integer>();
 	
-	/**
+	/** Constructor.
 	 * 
 	 * @param inputGraph Given graph, now only accepts DAG.
-	 * @param sourceAddr Address of the file that contains the list of sources in the graph.
-	 * @param destinationAddr Address of the file that contains the list of destinations in the graph.
-	 * @throws IOException If the files cannot be found, throw errors.
+	 * @throws IOException 
+	 *
 	 */
-	public nodeCentrality(Graph<String, DefaultEdge> inputGraph, String sourceAddr, String destinationAddr) throws IOException{
+	public nodeCentrality(Graph<String, DefaultEdge> inputGraph, String sourceAddr, String destinationAddr) throws IOException {
 		// initiate graph
-		graph = (DirectedAcyclicGraph<String,DefaultEdge>) inputGraph;
-		nodes = graph.vertexSet();
-		if(graph instanceof DirectedAcyclicGraph<?, ?>){
-			traverseOrder = new TopologicalOrderIterator<String, DefaultEdge>((DirectedGraph<String, DefaultEdge>) graph);// need to be fixed
-		}else{
-			traverseOrder = new BreadthFirstIterator<String, DefaultEdge>(graph);// need to choose start vertex
-		}
+		graph = (DirectedGraph<String,DefaultEdge>) inputGraph;
+		setParameters(sourceAddr, destinationAddr);
+	}
 	
+	public nodeCentrality(Graph<String, DefaultEdge> inputGraph, Set<String> srcSet, Set<String> dstnSet){
+		graph = (DirectedGraph<String,DefaultEdge>) inputGraph;
+		sourceSet = srcSet;
+		destinationSet = dstnSet;
+	}
+	
+	private void setParameters (String sourceAddr, String destinationAddr) throws IOException{
 		// initiate sources and destinations
 		File fin1 = new File(sourceAddr);
 		File fin2 = new File(destinationAddr);
@@ -48,30 +47,31 @@ public class nodeCentrality {
 		BufferedReader br2 = new BufferedReader(new FileReader(fin2));
 
 		String line = null;
-		
+				
 		while ((line = br1.readLine()) != null) {
 			sourceSet.add(line);
 		}
-	 
+			 
 		br1.close();
-		
+				
 		while ((line = br2.readLine()) != null) {
 			destinationSet.add(line);
 		}
-	 
+			 
 		br2.close();
-		// get impact
-		getImpact();
 	}
+	
 	/**
 	 * This method computes the impact of every node in the graph.
 	 */
-	private void getImpact(){
+	private HashMap<String, Integer> getAllNodeImpact(){
 		// definition: prefix, suffix, PLIST
 		HashMap<String, Integer> prefix = new HashMap<String, Integer>();
 		HashMap<String, Integer> suffix = new HashMap<String, Integer>();
 		HashMap<String, HashMap<String, Integer>> PLIST = new HashMap<String, HashMap<String, Integer>>();
-
+		HashMap<String, Integer> impact = new HashMap<String, Integer>();
+		Set<String> nodes = graph.vertexSet();
+		
 		// initiate PLIST, PLIST(v,v) = 1, PLIST(u,v) = 0
 		Iterator<String> itr2 = nodes.iterator();
 		while(itr2.hasNext()){
@@ -91,24 +91,28 @@ public class nodeCentrality {
 		}
 				
 		// temporary for DAG
-		DirectedAcyclicGraph<String,DefaultEdge> dag = (DirectedAcyclicGraph<String,DefaultEdge>) graph;
-		DirectedAcyclicGraph<String,DefaultEdge>.TopoVertexMap topoMap = dag.new TopoVertexMap();
+		DirectedGraph<String,DefaultEdge> dag = (DirectedGraph<String,DefaultEdge>) graph;
+		ArrayList<String> topoList = new ArrayList<String>(nodes.size());
 		
 		Iterator<String> sourceOrder = sourceSet.iterator();
 		
 		while(sourceOrder.hasNext()){
+			Iterator<String> traverseOrder = nodes.iterator();// initialized to random order
+			if(graph instanceof DirectedGraph<?, ?>){
+				traverseOrder = new TopologicalOrderIterator<String, DefaultEdge>((DirectedGraph<String, DefaultEdge>) graph);// need to be fixed
+			}else{
+				traverseOrder = new BreadthFirstIterator<String, DefaultEdge>(graph);// need to choose start vertex
+			}
 			
 			String currSource = sourceOrder.next();
-			Iterator<String> tempTraverseOrder = dag.iterator();
 			HashMap<String, Integer> tempPathLength = new HashMap<String, Integer>();
 			tempPathLength.put(currSource, 0);
 			
 			int topoIndex = 0;
-			while(tempTraverseOrder.hasNext()){
+			while(traverseOrder.hasNext()){
 				
-				String currNode = tempTraverseOrder.next();
-				topoMap.putVertex(topoIndex, currNode);
-				
+				String currNode = traverseOrder.next();
+				topoList.add(topoIndex, currNode);
 				// prefix & PLIST
 				
 				// path length
@@ -144,8 +148,8 @@ public class nodeCentrality {
 				// PLIST
 				HashMap<String, Integer> currHashMap = PLIST.get(currNode);
 				for(int i = 0; i < topoIndex; i++){
-					
-					String currAncestor = topoMap.getVertex(i);
+
+					String currAncestor = topoList.get(i);
 					// PLIST recurrent relation:
 					int sum2 = 0;
 					Iterator<String> parentOrder2 = parents.iterator();
@@ -175,7 +179,7 @@ public class nodeCentrality {
 					sum += PLIST.get(itr0.next()).get(currNode);
 				}
 				suffix.put(currNode, sum);
-				// aggregate impact of different sources
+				// aggregate impacts of different sources
 				if (!impact.containsKey(currNode)){
 					impact.put(currNode, prefix.get(currNode)*sum);
 				}else{
@@ -183,6 +187,19 @@ public class nodeCentrality {
 					impact.put(currNode, temp + prefix.get(currNode)*sum);
 				}
 			}
+		}
+		return impact;
+	}
+	
+	public int getNodeImpact(String theNode){
+		Set<String> nodes = graph.vertexSet();
+		if(!nodes.contains(theNode)){
+			throw new Error("The node is not in this graph. Please try again.");
+		}else{
+			if (impact.isEmpty()){
+				impact = getAllNodeImpact();// execute only once
+			}
+				return impact.get(theNode);
 		}
 	}
 
