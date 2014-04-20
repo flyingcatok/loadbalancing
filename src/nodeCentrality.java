@@ -7,11 +7,8 @@ import org.jgrapht.alg.DijkstraShortestPath;
 import org.jgrapht.graph.*;
 import org.jgrapht.traverse.*;
 
-/** This class computes the impact (currently the number of shortest paths from sources to destinations that pass certain node) 
- * of every node of a graph (currently only DAG).
- * 
+/** This class provided methods to compute the impact of certain node (# of shortest path covered by the node) over a directed graph.
  * @author Feiyu Shi
- *
  */
 public class nodeCentrality {
 	protected Graph<String, DefaultEdge> graph;
@@ -23,7 +20,9 @@ public class nodeCentrality {
 	/** Constructor.
 	 * 
 	 * @param inputGraph Given graph, now only accepts DAG.
-	 * @throws IOException 
+	 * @param sourceAddr The address of file that contains the source nodes.
+	 * @param destinationAddr The address of file that contains the destination nodes.
+	 * @throws IOException File not found.
 	 *
 	 */
 	public nodeCentrality(Graph<String, DefaultEdge> inputGraph, String sourceAddr, String destinationAddr) throws IOException {
@@ -32,12 +31,24 @@ public class nodeCentrality {
 		setParameters(sourceAddr, destinationAddr);
 	}
 	
+	/** Constructor of variance.
+	 * 
+	 * @param inputGraph Given graph.
+	 * @param srcSet Set of source nodes.
+	 * @param dstnSet Set of destination nodes.
+	 */
 	public nodeCentrality(Graph<String, DefaultEdge> inputGraph, Set<String> srcSet, Set<String> dstnSet){
 		graph = (DirectedGraph<String,DefaultEdge>) inputGraph;
 		sourceSet = srcSet;
 		destinationSet = dstnSet;
 	}
 	
+	/** The method that set the values of source set and destination set.
+	 * 
+	 * @param sourceAddr The address of file that contains the source nodes.
+	 * @param destinationAddr The address of file that contains the destination nodes.
+	 * @throws IOException File not found.
+	 */
 	private void setParameters (String sourceAddr, String destinationAddr) throws IOException{
 		// initiate sources and destinations
 		File fin1 = new File(sourceAddr);
@@ -191,6 +202,11 @@ public class nodeCentrality {
 		return impact;
 	}
 	
+	/** This method computes the impact of given node.
+	 * 
+	 * @param theNode Node of interest.
+	 * @return the impact.
+	 */
 	public int getNodeImpact(String theNode){
 		Set<String> nodes = graph.vertexSet();
 		if(!nodes.contains(theNode)){
