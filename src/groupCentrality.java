@@ -1,8 +1,7 @@
 import java.io.*;
 import java.util.*;
 
-import org.jgrapht.DirectedGraph;
-import org.jgrapht.Graph;
+import org.jgrapht.*;
 import org.jgrapht.alg.DijkstraShortestPath;
 import org.jgrapht.graph.*;
 import org.jgrapht.traverse.*;
@@ -12,7 +11,7 @@ import org.jgrapht.traverse.*;
  */
 public class groupCentrality extends nodeCentrality{
 
-	private Set<String> groupSet = new HashSet<String>();
+	protected Set<String> groupSet = new HashSet<String>();
 	
 	/** Constructor.
 	 * 
