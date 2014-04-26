@@ -15,7 +15,7 @@ public class nodeCentrality {
 //	private Iterator<String> traverseOrder;// may be deleted later
 	protected Set<String> sourceSet = new HashSet<String>();
 	protected Set<String> destinationSet = new HashSet<String>();
-	private HashMap<String, Integer> impact = new HashMap<String, Integer>();
+	private HashMap<String, Long> impact = new HashMap<String, Long>();
 	
 	/** Constructor.
 	 * 
@@ -75,26 +75,26 @@ public class nodeCentrality {
 	/**
 	 * This method computes the impact of every node in the graph.
 	 */
-	private HashMap<String, Integer> getAllNodeImpact(){
+	private HashMap<String, Long> getAllNodeImpact(){
 		// definition: prefix, suffix, PLIST
-		HashMap<String, Integer> prefix = new HashMap<String, Integer>();
-		HashMap<String, Integer> suffix = new HashMap<String, Integer>();
-		HashMap<String, HashMap<String, Integer>> PLIST = new HashMap<String, HashMap<String, Integer>>();
-		HashMap<String, Integer> impact = new HashMap<String, Integer>();
+		HashMap<String, Long> prefix = new HashMap<String, Long>();
+		HashMap<String, Long> suffix = new HashMap<String, Long>();
+		HashMap<String, HashMap<String, Long>> PLIST = new HashMap<String, HashMap<String, Long>>();
+		HashMap<String, Long> impact = new HashMap<String, Long>();
 		Set<String> nodes = graph.vertexSet();
 		
 		// initiate PLIST, PLIST(v,v) = 1, PLIST(u,v) = 0
 		Iterator<String> itr2 = nodes.iterator();
 		while(itr2.hasNext()){
 			String currNode = itr2.next();
-			HashMap<String, Integer> temp = new HashMap<String, Integer>();
+			HashMap<String, Long> temp = new HashMap<String, Long>();
 			Iterator<String> itr3 = nodes.iterator();
 			while(itr3.hasNext()){
 				String tempNode = itr3.next();
 				if (tempNode == currNode){
-					temp.put(currNode, 1);
+					temp.put(currNode, (long) 1);
 				}else{
-					temp.put(tempNode, 0);
+					temp.put(tempNode, (long) 0);
 				}
 			}
 			
@@ -140,7 +140,7 @@ public class nodeCentrality {
 				}
 				// prefix recurrence relation:
 				Iterator<String> parentOrder = parents.iterator();
-				int sum = 0;
+				long sum = 0;
 				while(parentOrder.hasNext()){
 					// check if parent is on a shortest path
 					String tempParent = parentOrder.next();
@@ -153,23 +153,23 @@ public class nodeCentrality {
 				prefix.put(currNode, sum);
 				// initiate prefix, prefix(source) = 1
 				if (currNode.equals(currSource)){
-					prefix.put(currNode, 1);
+					prefix.put(currNode, (long) 1);
 				}
 					
 				// PLIST
-				HashMap<String, Integer> currHashMap = PLIST.get(currNode);
+				HashMap<String, Long> currHashMap = PLIST.get(currNode);
 				for(int i = 0; i < topoIndex; i++){
 
 					String currAncestor = topoList.get(i);
 					// PLIST recurrent relation:
-					int sum2 = 0;
+					long sum2 = 0;
 					Iterator<String> parentOrder2 = parents.iterator();
 					while(parentOrder2.hasNext()){
 						// check if parent is on a shortest path
 						String currParent = parentOrder2.next();
 						if (tempPathLength.containsKey(currParent)){
 							if(tempPathLength.get(currNode) - tempPathLength.get(currParent) == 1){
-								HashMap<String, Integer> tempHashMap = PLIST.get(currParent);
+								HashMap<String, Long> tempHashMap = PLIST.get(currParent);
 								sum2 += tempHashMap.get(currAncestor);
 							}
 						}
@@ -185,7 +185,7 @@ public class nodeCentrality {
 			while(itr.hasNext()){
 				String currNode = itr.next();
 				Iterator<String> itr0 = destinationSet.iterator();
-				int sum = 0;
+				long sum = 0;
 				while(itr0.hasNext()){
 					sum += PLIST.get(itr0.next()).get(currNode);
 				}
@@ -194,7 +194,7 @@ public class nodeCentrality {
 				if (!impact.containsKey(currNode)){
 					impact.put(currNode, prefix.get(currNode)*sum);
 				}else{
-					int temp = impact.get(currNode);
+					long temp = impact.get(currNode);
 					impact.put(currNode, temp + prefix.get(currNode)*sum);
 				}
 			}
@@ -207,7 +207,7 @@ public class nodeCentrality {
 	 * @param theNode Node of interest.
 	 * @return the impact.
 	 */
-	public int getNodeImpact(String theNode){
+	public long getNodeImpact(String theNode){
 		Set<String> nodes = graph.vertexSet();
 		if(!nodes.contains(theNode)){
 			throw new Error("The node is not in this graph. Please try again.");
