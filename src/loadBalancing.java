@@ -23,6 +23,10 @@ public class loadBalancing extends groupCentrality {
 		super(inputGraph, sourceAddr, destinationAddr, groupAddr);
 	}
 	
+	public loadBalancing(Graph<String, DefaultEdge> inputGraph, Set<String> srcSet, Set<String> dstnSet, Set<String> grpSet){
+		super(inputGraph, srcSet, dstnSet, grpSet);
+	}
+	
 	/** This method gives a power set of given set. 
 	 * Reference: http://rosettacode.org/wiki/Power_set#Java
 	 * @param list The given set.
