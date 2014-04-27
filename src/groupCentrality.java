@@ -26,6 +26,11 @@ public class groupCentrality extends nodeCentrality{
 		setParameters(groupAddr);
 	}
 	
+	public groupCentrality(Graph<String, DefaultEdge> inputGraph, Set<String> srcSet, Set<String> dstnSet, Set<String> grpSet){
+		super(inputGraph, srcSet, dstnSet);
+		groupSet = grpSet;
+	}
+	
 	/** Set group from file.
 	 * 
 	 * @param groupAddr The address of file that contains nodes of a group.
