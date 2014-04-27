@@ -116,8 +116,8 @@ public class nodeCentrality {
 			}
 			
 			String currSource = sourceOrder.next();
-			HashMap<String, Integer> tempPathLength = new HashMap<String, Integer>();
-			tempPathLength.put(currSource, 0);
+			HashMap<String, Long> tempPathLength = new HashMap<String, Long>();
+			tempPathLength.put(currSource, (long) 0);
 			
 			int topoIndex = 0;
 			while(traverseOrder.hasNext()){
@@ -130,7 +130,7 @@ public class nodeCentrality {
 				DijkstraShortestPath<String,DefaultEdge> sp = new DijkstraShortestPath<String,DefaultEdge>(dag, currSource, currNode);
 				double pathLength= sp.getPathLength();
 				if (pathLength == Double.POSITIVE_INFINITY){pathLength = 0;}
-				tempPathLength.put(currNode, (int)pathLength);
+				tempPathLength.put(currNode, (long)pathLength);
 				// get parents of current node
 				Set<DefaultEdge> inCommingEdges = dag.incomingEdgesOf(currNode);
 				Iterator<DefaultEdge> inCommingEdgesOrder = inCommingEdges.iterator();
