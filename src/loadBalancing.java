@@ -66,7 +66,7 @@ public class loadBalancing extends groupCentrality {
 	/** This method gives all possible assignments of the load balancing problem, but it takes the longest of time.
 	 * @return A list of sets, together with its complement set (not in the list) forms the answer.
 	 */
-	public List<Set<String>> getGroupAssignment_baseLine (){// may have more efficient implementation
+	public List<Set<String>> getGroupAssignment_bruteForce (){// may have more efficient implementation
 		Set<String> nodes = graph.vertexSet();
 		if(!nodes.containsAll(groupSet)){
 			throw new Error("The group nodes are not in this graph. Please check the group.");
@@ -125,6 +125,8 @@ public class loadBalancing extends groupCentrality {
 			sumOfImpact.put(currNode, Math.abs(getSumOfConditionalImpactOfG1G2(currNode, tempG1, g2)-impactDifference));
 		}
 		List<String> nodesWithMaxOfSumOfImpact = getKeysWithMinValuesFromMap1(sumOfImpact);
+		// add some randomness
+		Collections.shuffle(nodesWithMaxOfSumOfImpact);
 		String theNode = nodesWithMaxOfSumOfImpact.get(0);
 		// remove the node from g1 and add it to g2
 		
@@ -254,13 +256,14 @@ public class loadBalancing extends groupCentrality {
 
 				long difference = Math.abs(getGroupImpact(G1) - getGroupImpact(G2));
 				
-				if (difference == 0 && difference <= impactDifference && !G1.isEmpty()){
-					assgns.put(G2, difference);
-					visited.add(G2);
-					helper_greedySearch(chosenNode, G1, G2, difference, assgns, visited);
-				}else if (difference != 0 && difference <= impactDifference && !G1.isEmpty()){
-					helper_greedySearch(chosenNode, G1, G2, difference, assgns, visited);
-				}else{
+				if(difference <= impactDifference && !G1.isEmpty()){
+					if(difference == 0 || difference == impactDifference){
+						assgns.put(G2, difference);
+						visited.add(G2);
+					}
+					helper_fullSearch(chosenNode, G1, G2, difference, assgns, visited);
+				}
+				else{
 					G1.add(chosenNode);
 					G2.remove(chosenNode);
 					visited.add(G2);
@@ -270,9 +273,10 @@ public class loadBalancing extends groupCentrality {
 		}
 	} 
 	
-	/** This method upgrades the greedy algorithm. It could return more possible assignments if there are more than one correct assignments.
+	/** This method upgrades the greedy algorithm. search with pruning.
+	 * It could return more possible assignments if there are more than one correct assignments.
 	 * 
-	 * @return
+	 * @return a list of possible assignments. May not get the correct assignment.
 	 */
 	public List<Set<String>> getGroupAssignment_greedySearch (){
 		Set<String> nodes = graph.vertexSet();
@@ -288,6 +292,13 @@ public class loadBalancing extends groupCentrality {
 			
 			Set<String> g1 = new HashSet<String>(groupSet);// full set
 			Set<String> g2 = new HashSet<String>(groupSet.size());// empty set
+			
+			// special case
+			long differenceTop = Math.abs(getGroupImpact(g1) - getGroupImpact(g2));
+			if(differenceTop == 0){
+				assgns.put(g2, differenceTop);
+				visited.add(g2);
+			}
 			
 			Iterator<String> itr = g1.iterator();
 			HashMap<String, Long> sumOfImpact = new HashMap<String, Long>(g1.size());
@@ -313,7 +324,7 @@ public class loadBalancing extends groupCentrality {
 				if(!visited.contains(G1) && !visited.contains(G2)){
 
 					long difference = Math.abs(getGroupImpact(G1) - getGroupImpact(G2));
-					if(difference == 0){
+					if(difference == 0 || difference == differenceTop){
 						assgns.put(G2, difference);
 						visited.add(G2);
 						helper_greedySearch(theNode, G1, G2, difference, assgns, visited);
@@ -323,9 +334,118 @@ public class loadBalancing extends groupCentrality {
 				}
 			}
 			List<Set<String>> res = getKeysWithMinValuesFromMap(assgns);
+			// special check for the top case
+			boolean flag = true;
+			Collection<Long> v = assgns.values();
+			Iterator<Long> itrv = v.iterator();
+			while(itrv.hasNext()){
+				long temp = itrv.next();
+				if (temp != differenceTop){
+					flag = false;
+				}
+			}
+			if(flag && !res.contains(g2)){
+				res.add(g2);
+			}
 			return res;
 		}
 
 	}
+	
+	private void helper_fullSearch (String theNode, Set<String> g1, Set<String> g2, long impactDifference, HashMap<Set<String>, Long> assgns, Set<Set<String>> visited){
+		
+		Iterator<String> itr = g1.iterator();
+		while(itr.hasNext()){
+			String chosenNode = itr.next();
+			Set<String> G1 = new HashSet<String>(g1);// full set copy
+			Set<String> G2 = new HashSet<String>(g2);// empty set copy
+			// remove the node from g1 and add it to g2
+			G1.remove(chosenNode);
+			G2.add(chosenNode);
 
+			if(!visited.contains(G1) && !visited.contains(G2)){ // if the new G1 & G2 are not evaluated, proceed.
+
+				long difference = Math.abs(getGroupImpact(G1) - getGroupImpact(G2));
+				
+				if(difference <= impactDifference && !G1.isEmpty()){
+					if(difference == 0 || difference == impactDifference){
+						assgns.put(G2, difference);
+						visited.add(G2);
+					}
+					helper_fullSearch(chosenNode, G1, G2, difference, assgns, visited);
+				}
+				else{
+					G1.add(chosenNode);
+					G2.remove(chosenNode);
+					visited.add(G2);
+					assgns.put(G2, impactDifference);
+				}
+			}
+		}
+	} 
+	
+	/** This method relax the constraint that only pick the node whose sum of conditional impacts which is closest to the impact difference.
+	 *  search with pruning. can find all the solutions
+	 * @return a list of all possible assignments. 
+	 */
+	public List<Set<String>> getGroupAssignment_fullSearch (){
+		Set<String> nodes = graph.vertexSet();
+		if(!nodes.containsAll(groupSet)){
+			throw new Error("The group nodes are not in this graph. Please check the group.");
+		}else if(!nodes.containsAll(sourceSet)){
+			throw new Error("The sources are not in this graph. Please check sources.");
+		}else if(!nodes.containsAll(destinationSet)){
+			throw new Error("The destinations are not in this graph. Please check destinations.");
+		}else{
+			HashMap<Set<String>, Long> assgns = new HashMap<Set<String>, Long>();
+			Set<Set<String>> visited = new HashSet<Set<String>>();
+			
+			Set<String> g1 = new HashSet<String>(groupSet);// full set
+			Set<String> g2 = new HashSet<String>(groupSet.size());// empty set
+			
+			// special case
+			long differenceTop = Math.abs(getGroupImpact(g1) - getGroupImpact(g2));
+			if(differenceTop == 0){
+				assgns.put(g2, differenceTop);
+				visited.add(g2);
+			}
+			
+			Iterator<String> itr = g1.iterator();
+			while(itr.hasNext()){
+				String theNode = itr.next();
+				Set<String> G1 = new HashSet<String>(g1);// full set copy
+				Set<String> G2 = new HashSet<String>(g2);// empty set copy
+				G1.remove(theNode);
+				G2.add(theNode);
+
+				if(!visited.contains(G1) && !visited.contains(G2)){
+
+					long difference = Math.abs(getGroupImpact(G1) - getGroupImpact(G2));
+					if(difference == 0 || difference == differenceTop){
+						assgns.put(G2, difference);
+						visited.add(G2);
+						helper_fullSearch(theNode, G1, G2, difference, assgns, visited);
+					}else{
+						helper_fullSearch(theNode, G1, G2, difference, assgns, visited);
+					}
+				}
+			}
+
+			List<Set<String>> res = getKeysWithMinValuesFromMap(assgns);
+			// special check for top case
+			boolean flag = true;
+			Collection<Long> v = assgns.values();
+			Iterator<Long> itrv = v.iterator();
+			while(itrv.hasNext()){
+				long temp = itrv.next();
+				if (temp != differenceTop){
+					flag = false;
+				}
+			}
+			if(flag && !res.contains(g2)){
+				res.add(g2);
+			}
+			return res;
+		}
+	}
 }
