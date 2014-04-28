@@ -7,13 +7,14 @@ import org.jgrapht.graph.*;
 import org.jgrapht.traverse.*;
 
 /** This class provides methods to compute the group impact (# of shortest path covered by the group) over a directed graph.
+ * Reference: Vatche Ishakian, D—ra Erdšs, Evimaria Terzi, and Azer Bestavros. "A Framework for the Evaluation and Management of Network Centrality." In SDM, pp. 427-438. 2012.
  * @author Feiyu Shi
  */
 public class groupCentrality extends nodeCentrality{
 
 	protected Set<String> groupSet = new HashSet<String>();
 	
-	/** Constructor.
+	/** Constructor with inputs of graph and addresses of files containing the source, destination and the group.
 	 * 
 	 * @param inputGraph 
 	 * @param sourceAddr
@@ -26,6 +27,13 @@ public class groupCentrality extends nodeCentrality{
 		setParameters(groupAddr);
 	}
 	
+	/** Constructor with inputs of graph and sets.
+	 * 
+	 * @param inputGraph
+	 * @param srcSet
+	 * @param dstnSet
+	 * @param grpSet
+	 */
 	public groupCentrality(Graph<String, DefaultEdge> inputGraph, Set<String> srcSet, Set<String> dstnSet, Set<String> grpSet){
 		super(inputGraph, srcSet, dstnSet);
 		groupSet = grpSet;
@@ -58,15 +66,25 @@ public class groupCentrality extends nodeCentrality{
 	 * @return the group impact.
 	 */
 	public long getGroupImpact() {
-		Set<String> tempGroup = new HashSet<String>(groupSet.size());// empty set
-		Iterator<String> groupItr = groupSet.iterator();// for all nodes in the group
-		long sum = 0;
-		while(groupItr.hasNext()){
-			String currNode = groupItr.next();
-			sum += getConditionalImpact(currNode, tempGroup);
-			tempGroup.add(currNode);
+		Set<String> nodes = graph.vertexSet();
+		if(!nodes.containsAll(groupSet)){
+			throw new Error("The group nodes are not in this graph. Please check the group.");
+		}else if(!nodes.containsAll(sourceSet)){
+			throw new Error("The sources are not in this graph. Please check sources.");
+		}else if(!nodes.containsAll(destinationSet)){
+			throw new Error("The destinations are not in this graph. Please check destinations.");
+		}else{
+			Set<String> tempGroup = new HashSet<String>(groupSet.size());// empty set
+			Iterator<String> groupItr = groupSet.iterator();// for all nodes in the group
+			long sum = 0;
+			while(groupItr.hasNext()){
+				String currNode = groupItr.next();
+				sum += getConditionalImpact(currNode, tempGroup);
+				tempGroup.add(currNode);
+			}
+			return sum;
 		}
-		return sum;
+		
 	}
 	
 	/** The method that computes the group impact of the given group.
@@ -77,9 +95,18 @@ public class groupCentrality extends nodeCentrality{
 	public long getGroupImpact(Set<String> theGroup){
 		Set<String> groupFromFile = groupSet;
 		groupSet = theGroup;
-		long theGroupImpact = getGroupImpact();
-		groupSet = groupFromFile;
-		return theGroupImpact;
+		Set<String> nodes = graph.vertexSet();
+		if(!nodes.containsAll(groupSet)){
+			throw new Error("The group nodes are not in this graph. Please check the group.");
+		}else if(!nodes.containsAll(sourceSet)){
+			throw new Error("The sources are not in this graph. Please check sources.");
+		}else if(!nodes.containsAll(destinationSet)){
+			throw new Error("The destinations are not in this graph. Please check destinations.");
+		}else{
+			long theGroupImpact = getGroupImpact();
+			groupSet = groupFromFile;
+			return theGroupImpact;
+		}
 	}
 	
 	/** The methods that computes the conditional impact of the node with respect to the given group of node.

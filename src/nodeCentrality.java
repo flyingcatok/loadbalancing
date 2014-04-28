@@ -8,11 +8,11 @@ import org.jgrapht.graph.*;
 import org.jgrapht.traverse.*;
 
 /** This class provided methods to compute the impact of certain node (# of shortest path covered by the node) over a directed graph.
+ * Reference: Vatche Ishakian, D—ra Erdšs, Evimaria Terzi, and Azer Bestavros. "A Framework for the Evaluation and Management of Network Centrality." In SDM, pp. 427-438. 2012.
  * @author Feiyu Shi
  */
 public class nodeCentrality {
 	protected Graph<String, DefaultEdge> graph;
-//	private Iterator<String> traverseOrder;// may be deleted later
 	protected Set<String> sourceSet = new HashSet<String>();
 	protected Set<String> destinationSet = new HashSet<String>();
 	private HashMap<String, Long> impact = new HashMap<String, Long>();
@@ -210,7 +210,11 @@ public class nodeCentrality {
 	public long getNodeImpact(String theNode){
 		Set<String> nodes = graph.vertexSet();
 		if(!nodes.contains(theNode)){
-			throw new Error("The node is not in this graph. Please try again.");
+			throw new Error("The requested node is not in this graph. Please try again.");
+		}else if(!nodes.containsAll(sourceSet)){
+			throw new Error("The sources are not in this graph. Please check sources.");
+		}else if(!nodes.containsAll(destinationSet)){
+			throw new Error("The destinations are not in this graph. Please check destinations.");
 		}else{
 			if (impact.isEmpty()){
 				impact = getAllNodeImpact();// execute only once

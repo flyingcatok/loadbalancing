@@ -4,12 +4,12 @@ import java.util.*;
 import org.jgrapht.*;
 import org.jgrapht.graph.*;
 
-/** This class provides methods that can divide a group of nodes into two, whose group impact difference is minimum.
+/** This class provides methods that can divide a group of nodes into two, whose group impact difference is minimized.
  * @author Feiyu Shi
  */
 public class loadBalancing extends groupCentrality {
 
-	/** Constructor.
+	/** Constructor with address of files containing source, destination and group.
 	 * 
 	 * @param inputGraph Input directed graph.
 	 * @param sourceAddr 
@@ -23,6 +23,13 @@ public class loadBalancing extends groupCentrality {
 		super(inputGraph, sourceAddr, destinationAddr, groupAddr);
 	}
 	
+	/** Constructor with sets of sources, destinations and the group.
+	 * 
+	 * @param inputGraph
+	 * @param srcSet
+	 * @param dstnSet
+	 * @param grpSet
+	 */
 	public loadBalancing(Graph<String, DefaultEdge> inputGraph, Set<String> srcSet, Set<String> dstnSet, Set<String> grpSet){
 		super(inputGraph, srcSet, dstnSet, grpSet);
 	}
@@ -60,41 +67,52 @@ public class loadBalancing extends groupCentrality {
 	 * @return A list of sets, together with its complement set (not in the list) forms the answer.
 	 */
 	public List<Set<String>> getGroupAssignment_baseLine (){// may have more efficient implementation
-		List<Set<String>> ps = powerSet(groupSet);
-		List<Long> gc = new ArrayList<Long>(ps.size());
-		List<Set<String>> res = new ArrayList<Set<String>>();
-		
-		for(int i = 0; i< ps.size(); i++){
-			gc.add(i, getGroupImpact(ps.get(i)));
-		}
-		
-		long min = Long.MAX_VALUE;
-		int sz = gc.size() / 2;
-		for(int i = 0; i< sz; i++){
-			long diff = Math.abs(gc.get(i) - gc.get(gc.size()-i-1));
-			if (diff <= min){
-				min = diff;
+		Set<String> nodes = graph.vertexSet();
+		if(!nodes.containsAll(groupSet)){
+			throw new Error("The group nodes are not in this graph. Please check the group.");
+		}else if(!nodes.containsAll(sourceSet)){
+			throw new Error("The sources are not in this graph. Please check sources.");
+		}else if(!nodes.containsAll(destinationSet)){
+			throw new Error("The destinations are not in this graph. Please check destinations.");
+		}else{
+			List<Set<String>> ps = powerSet(groupSet);
+			List<Long> gc = new ArrayList<Long>(ps.size());
+			List<Set<String>> res = new ArrayList<Set<String>>();
+			
+			for(int i = 0; i< ps.size(); i++){
+				gc.add(i, getGroupImpact(ps.get(i)));
 			}
+			
+			long min = Long.MAX_VALUE;
+			int sz = gc.size() / 2;
+			for(int i = 0; i< sz; i++){
+				long diff = Math.abs(gc.get(i) - gc.get(gc.size()-i-1));
+				if (diff <= min){
+					min = diff;
+				}
+			}
+			
+			for(int i = 0; i< sz; i++){
+				long diff = Math.abs(gc.get(i) - gc.get(gc.size()-i-1));
+				if (diff == min){
+					res.add(ps.get(i));
+				}
+			}
+			return res;
 		}
 		
-		for(int i = 0; i< sz; i++){
-			long diff = Math.abs(gc.get(i) - gc.get(gc.size()-i-1));
-			if (diff == min){
-				res.add(ps.get(i));
-			}
-		}
-		return res;
 	}
 	
-	/** This method gives a possible assignment of the load balancing problem, which may not be the best.
+	/** Helper function for greedy algorithm. for recursive use.
 	 * 
 	 * @param g1 the first group of nodes. Initially is the whole group
 	 * @param g2 the second group of nodes. Initially is the empty group
 	 * @param impactDifference the difference of impacts of g1 and g2
 	 * @return a possible assignment of load balancing
 	 */
-	private List<Set<String>> helper_greedy(Set<String> g1, Set<String> g2, long impactDifference){
-		List<Set<String>> res = new ArrayList<Set<String>>();
+	private Set<String> helper_greedy(Set<String> g1, Set<String> g2, long impactDifference){
+//		List<Set<String>> res = new ArrayList<Set<String>>();
+		Set<String> res = new HashSet<String>();
 		
 		Iterator<String> itr = g1.iterator();
 		HashMap<String, Long> sumOfImpact = new HashMap<String, Long>(g1.size());
@@ -118,19 +136,33 @@ public class loadBalancing extends groupCentrality {
 			return helper_greedy(g1, g2, difference);
 		}else{
 			g1.add(theNode);
-			res.add(g1);
+			res=(g1);
 			return res;
 		}	
 	}
 	
-	public List<Set<String>> getGroupAssignment_greedy(){
-		Set<String> g1 = new HashSet<String>(groupSet);// full set
-		Set<String> g2 = new HashSet<String>(groupSet.size());// empty set
-		long  impactDifference = getGroupImpact(g1);
-		return helper_greedy(g1, g2, impactDifference);
+	/** This method gives one possible assignment of the load balancing problem.
+	 * 
+	 * @return one assignment of sets.
+	 */
+	public Set<String> getGroupAssignment_greedy(){
+		Set<String> nodes = graph.vertexSet();
+		if(!nodes.containsAll(groupSet)){
+			throw new Error("The group nodes are not in this graph. Please check the group.");
+		}else if(!nodes.containsAll(sourceSet)){
+			throw new Error("The sources are not in this graph. Please check sources.");
+		}else if(!nodes.containsAll(destinationSet)){
+			throw new Error("The destinations are not in this graph. Please check destinations.");
+		}else{
+			Set<String> g1 = new HashSet<String>(groupSet);// full set
+			Set<String> g2 = new HashSet<String>(groupSet.size());// empty set
+			long  impactDifference = getGroupImpact(g1);
+			return helper_greedy(g1, g2, impactDifference);
+		}
+		
 	}
 	
-	/** This methods returns a list of keys with largest values.
+	/** This methods returns a list of keys with max values in the map.
 	 * 
 	 * @param map Given map.
 	 * @return Keys with largest integer value.
@@ -145,6 +177,11 @@ public class loadBalancing extends groupCentrality {
 		return res;
 	}
 	
+	/** This methods returns a list of keys with min values in the map. The key type is String.
+	 * 
+	 * @param map
+	 * @return
+	 */
 	private static List<String> getKeysWithMinValuesFromMap1(Map<String, Long> map){
 		List<String> res = new ArrayList<String>();
 		Collection<Long> valueSet = map.values();
@@ -155,6 +192,11 @@ public class loadBalancing extends groupCentrality {
 		return res;
 	}
 	
+	/** This methods returns a list of keys with min values in the map. The key type is Set<String>.
+	 * 
+	 * @param map
+	 * @return
+	 */
 	private static List<Set<String>> getKeysWithMinValuesFromMap(Map<Set<String>, Long> map){
 		List<Set<String>> res = new ArrayList<Set<String>>();
 		Collection<Long> valueSet = map.values();
@@ -176,6 +218,15 @@ public class loadBalancing extends groupCentrality {
 		return getConditionalImpact(theNode, G1) + getConditionalImpact(theNode, G2);
 	}
 
+	/** Helper function for greedy search algorithm. for recursive use.
+	 * 
+	 * @param theNode The picked node which is moved from group 1 to group 2
+	 * @param g1 group 1 not containing theNode
+	 * @param g2 group 2 containing theNode
+	 * @param impactDifference the difference of impacts of two groups after the change of theNode
+	 * @param assgns possible assignments with its difference of impacts. but not every one is the best.
+	 * @param visited already evaluated sets of nodes.
+	 */
 	private void helper_greedySearch (String theNode, Set<String> g1, Set<String> g2, long impactDifference, HashMap<Set<String>, Long> assgns, Set<Set<String>> visited){
 
 		Iterator<String> itr = g1.iterator();
@@ -203,11 +254,11 @@ public class loadBalancing extends groupCentrality {
 
 				long difference = Math.abs(getGroupImpact(G1) - getGroupImpact(G2));
 				
-				if (difference == 0 && difference <= impactDifference){
+				if (difference == 0 && difference <= impactDifference && !G1.isEmpty()){
 					assgns.put(G2, difference);
 					visited.add(G2);
 					helper_greedySearch(chosenNode, G1, G2, difference, assgns, visited);
-				}else if (difference != 0 && difference <= impactDifference){
+				}else if (difference != 0 && difference <= impactDifference && !G1.isEmpty()){
 					helper_greedySearch(chosenNode, G1, G2, difference, assgns, visited);
 				}else{
 					G1.add(chosenNode);
@@ -219,48 +270,62 @@ public class loadBalancing extends groupCentrality {
 		}
 	} 
 	
+	/** This method upgrades the greedy algorithm. It could return more possible assignments if there are more than one correct assignments.
+	 * 
+	 * @return
+	 */
 	public List<Set<String>> getGroupAssignment_greedySearch (){
-		HashMap<Set<String>, Long> assgns = new HashMap<Set<String>, Long>();
-		
-		Set<String> g1 = new HashSet<String>(groupSet);// full set
-		Set<String> g2 = new HashSet<String>(groupSet.size());// empty set
-		
-		Iterator<String> itr = g1.iterator();
-		HashMap<String, Long> sumOfImpact = new HashMap<String, Long>(g1.size());
+		Set<String> nodes = graph.vertexSet();
+		if(!nodes.containsAll(groupSet)){
+			throw new Error("The group nodes are not in this graph. Please check the group.");
+		}else if(!nodes.containsAll(sourceSet)){
+			throw new Error("The sources are not in this graph. Please check sources.");
+		}else if(!nodes.containsAll(destinationSet)){
+			throw new Error("The destinations are not in this graph. Please check destinations.");
+		}else{
+			HashMap<Set<String>, Long> assgns = new HashMap<Set<String>, Long>();
+			Set<Set<String>> visited = new HashSet<Set<String>>();
+			
+			Set<String> g1 = new HashSet<String>(groupSet);// full set
+			Set<String> g2 = new HashSet<String>(groupSet.size());// empty set
+			
+			Iterator<String> itr = g1.iterator();
+			HashMap<String, Long> sumOfImpact = new HashMap<String, Long>(g1.size());
 
-		while(itr.hasNext()){
-			String currNode = itr.next();
-			Set<String> tempG1 = new HashSet<String>(g1);
-			tempG1.remove(currNode);
-			// heuristic: sumOfImpact
-			sumOfImpact.put(currNode, getSumOfConditionalImpactOfG1G2(currNode, tempG1, g2));
-		}
-		
-		List<String> nodesWithMaxOfSumOfImpact = getKeysWithMaxValuesFromMap(sumOfImpact);
-		Iterator<String> itr2 = nodesWithMaxOfSumOfImpact.iterator();
-		Set<Set<String>> visited = new HashSet<Set<String>>();
+			while(itr.hasNext()){
+				String currNode = itr.next();
+				Set<String> tempG1 = new HashSet<String>(g1);
+				tempG1.remove(currNode);
+				// heuristic: sumOfImpact
+				sumOfImpact.put(currNode, getSumOfConditionalImpactOfG1G2(currNode, tempG1, g2));
+			}
+			
+			List<String> nodesWithMaxOfSumOfImpact = getKeysWithMaxValuesFromMap(sumOfImpact);
+			Iterator<String> itr2 = nodesWithMaxOfSumOfImpact.iterator();
+			
+			while(itr2.hasNext()){
+				String theNode = itr2.next();
+				Set<String> G1 = new HashSet<String>(g1);// full set copy
+				Set<String> G2 = new HashSet<String>(g2);// empty set copy
+				G1.remove(theNode);
+				G2.add(theNode);
 
-		while(itr2.hasNext()){
-			String theNode = itr2.next();
-			Set<String> G1 = new HashSet<String>(g1);// full set copy
-			Set<String> G2 = new HashSet<String>(g2);// empty set copy
-			G1.remove(theNode);
-			G2.add(theNode);
+				if(!visited.contains(G1) && !visited.contains(G2)){
 
-			if(!visited.contains(G1) && !visited.contains(G2)){
-
-				long difference = Math.abs(getGroupImpact(G1) - getGroupImpact(G2));
-				if(difference == 0){
-					assgns.put(G2, difference);
-					visited.add(G2);
-					helper_greedySearch(theNode, G1, G2, difference, assgns, visited);
-				}else{
-					helper_greedySearch(theNode, G1, G2, difference, assgns, visited);
+					long difference = Math.abs(getGroupImpact(G1) - getGroupImpact(G2));
+					if(difference == 0){
+						assgns.put(G2, difference);
+						visited.add(G2);
+						helper_greedySearch(theNode, G1, G2, difference, assgns, visited);
+					}else{
+						helper_greedySearch(theNode, G1, G2, difference, assgns, visited);
+					}
 				}
 			}
+			List<Set<String>> res = getKeysWithMinValuesFromMap(assgns);
+			return res;
 		}
-		List<Set<String>> res = getKeysWithMinValuesFromMap(assgns);
-		return res;
+
 	}
 
 }
