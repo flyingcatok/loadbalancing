@@ -85,8 +85,8 @@ public class test {
 			List<Set<String>> assgn_greedySearch = c[i].getGroupAssignment_greedySearch();
 			long totalTime_greedySearch = System.currentTimeMillis() - beginTime_greedySearch;
 			
-			long groupImpact1_greedySearch = c[i].getGroupImpact(assgn_greedy);
-			long groupImpact2_greedySearch = c[i].getGroupImpact(getComplementSet(c[i].groupSet, assgn_greedy));
+			long groupImpact1_greedySearch = c[i].getGroupImpact(assgn_greedySearch.get(0));
+			long groupImpact2_greedySearch = c[i].getGroupImpact(getComplementSet(c[i].groupSet, assgn_greedySearch.get(0)));
 			String impact_greedySearch = Long.toString(groupImpact1_greedySearch) + " vs. " + Long.toString(groupImpact2_greedySearch);
 			
 			int sz_assgn_greedySearch = assgn_greedySearch.size();
@@ -117,8 +117,8 @@ public class test {
 			List<Set<String>> assgn_fullSearch = c[i].getGroupAssignment_fullSearch();
 			long totalTime_fullSearch = System.currentTimeMillis() - beginTime_fullSearch;
 			
-			long groupImpact1_fullSearch = c[i].getGroupImpact(assgn_greedy);
-			long groupImpact2_fullSearch = c[i].getGroupImpact(getComplementSet(c[i].groupSet, assgn_greedy));
+			long groupImpact1_fullSearch = c[i].getGroupImpact(assgn_fullSearch.get(0));
+			long groupImpact2_fullSearch = c[i].getGroupImpact(getComplementSet(c[i].groupSet, assgn_fullSearch.get(0)));
 			String impact_fullSearch = Long.toString(groupImpact1_fullSearch) + " vs. " + Long.toString(groupImpact2_fullSearch);
 			
 			int sz_assgn_fullSearch = assgn_fullSearch.size();
