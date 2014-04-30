@@ -115,32 +115,38 @@ public class loadBalancing extends groupCentrality {
 		Set<String> res = new HashSet<String>();
 		
 		Iterator<String> itr = g1.iterator();
-		HashMap<String, Long> sumOfImpact = new HashMap<String, Long>(g1.size());
-
+		HashMap<String, Long> newDifferenceAbs = new HashMap<String, Long>(g1.size());
+		HashMap<String, Long> newDifference = new HashMap<String, Long>(g1.size());
+		
 		while(itr.hasNext()){
 			String currNode = itr.next();
 			Set<String> tempG1 = new HashSet<String>(g1);
 			tempG1.remove(currNode);
 			// heuristic: sumOfImpact
-			sumOfImpact.put(currNode, Math.abs(getSumOfConditionalImpactOfG1G2(currNode, tempG1, g2)-impactDifference));
+			long temp = getSumOfConditionalImpactOfG1G2(currNode, tempG1, g2);
+			newDifference.put(currNode,impactDifference-temp);
+			newDifferenceAbs.put(currNode, Math.abs(impactDifference-temp));	
 		}
-		List<String> nodesWithMaxOfSumOfImpact = getKeysWithMinValuesFromMap1(sumOfImpact);
+
+		List<String> nodesWithMaxOfSumOfImpact = getKeysWithMinValuesFromMap1(newDifferenceAbs);
 		// add some randomness
 		Collections.shuffle(nodesWithMaxOfSumOfImpact);
+
 		String theNode = nodesWithMaxOfSumOfImpact.get(0);
 		// remove the node from g1 and add it to g2
-		
+			
 		g1.remove(theNode);
 		g2.add(theNode);
-
-		long difference = Math.abs(getGroupImpact(g1) - getGroupImpact(g2));
-		if (difference < impactDifference){
+//		long difference1 = Math.abs(getGroupImpact(g1) - getGroupImpact(g2));
+		long difference = newDifference.get(theNode);
+		if (Math.abs(difference) <= Math.abs(impactDifference) && !g1.isEmpty()){
 			return helper_greedy(g1, g2, difference);
 		}else{
 			g1.add(theNode);
-			res=(g1);
+			res = g1;
 			return res;
 		}	
+		
 	}
 	
 	/** This method gives one possible assignment of the load balancing problem.
@@ -169,15 +175,15 @@ public class loadBalancing extends groupCentrality {
 	 * @param map Given map.
 	 * @return Keys with largest integer value.
 	 */
-	private static List<String> getKeysWithMaxValuesFromMap(Map<String, Long> map){
-		List<String> res = new ArrayList<String>();
-		Collection<Long> valueSet = map.values();
-		long minValue = Collections.max(valueSet);
-		for(String entry : map.keySet()){
-			if(map.get(entry).equals(minValue)) res.add(entry);
-		}
-		return res;
-	}
+//	private static List<String> getKeysWithMaxValuesFromMap(Map<String, Long> map){
+//		List<String> res = new ArrayList<String>();
+//		Collection<Long> valueSet = map.values();
+//		long minValue = Collections.max(valueSet);
+//		for(String entry : map.keySet()){
+//			if(map.get(entry).equals(minValue)) res.add(entry);
+//		}
+//		return res;
+//	}
 	
 	/** This methods returns a list of keys with min values in the map. The key type is String.
 	 * 
@@ -188,6 +194,12 @@ public class loadBalancing extends groupCentrality {
 		List<String> res = new ArrayList<String>();
 		Collection<Long> valueSet = map.values();
 		long minValue = Collections.min(valueSet);
+		if(minValue < 0){
+			valueSet.remove(minValue);
+		}
+		while(minValue < 0 && !valueSet.isEmpty()){
+			minValue = Collections.min(valueSet);
+		}
 		for(String entry : map.keySet()){
 			if(map.get(entry).equals(minValue)) res.add(entry);
 		}
@@ -232,17 +244,18 @@ public class loadBalancing extends groupCentrality {
 	private void helper_greedySearch (String theNode, Set<String> g1, Set<String> g2, long impactDifference, HashMap<Set<String>, Long> assgns, Set<Set<String>> visited){
 
 		Iterator<String> itr = g1.iterator();
-		HashMap<String, Long> sumOfImpact = new HashMap<String, Long>(g1.size());
-
+		HashMap<String, Long> newDifference = new HashMap<String, Long>(g1.size());
+		HashMap<String, Long> newDifferenceAbs = new HashMap<String, Long>(g1.size());
 		while(itr.hasNext()){
 			String currNode = itr.next();
 			Set<String> tempG1 = new HashSet<String>(g1);
 			tempG1.remove(currNode);
 			// heuristic: sumOfImpact
 			long temp = getSumOfConditionalImpactOfG1G2(currNode, tempG1, g2);
-			sumOfImpact.put(currNode, Math.abs(temp - impactDifference));// find the sumOfImpact which is closed to impactDifference
+			newDifference.put(currNode, impactDifference - temp);
+			newDifferenceAbs.put(currNode, Math.abs(temp - impactDifference));// find the sumOfImpact which is closed to impactDifference
 		}
-		List<String> nodesWithMaxOfSumOfImpact = getKeysWithMinValuesFromMap1(sumOfImpact); // actually the min of difference
+		List<String> nodesWithMaxOfSumOfImpact = getKeysWithMinValuesFromMap1(newDifferenceAbs); // actually the min of difference
 		Iterator<String> itr2 = nodesWithMaxOfSumOfImpact.iterator();
 		while(itr2.hasNext()){
 			String chosenNode = itr2.next();
@@ -254,20 +267,20 @@ public class loadBalancing extends groupCentrality {
 
 			if(!visited.contains(G1) && !visited.contains(G2)){ // if the new G1 & G2 are not evaluated, proceed.
 
-				long difference = Math.abs(getGroupImpact(G1) - getGroupImpact(G2));
-				
-				if(difference <= impactDifference && !G1.isEmpty()){
-					if(difference == 0 || difference == impactDifference){
-						assgns.put(G2, difference);
+//				long difference = Math.abs(getGroupImpact(G1) - getGroupImpact(G2));
+				long difference = newDifference.get(chosenNode);
+				if(Math.abs(difference) <= Math.abs(impactDifference) && !G1.isEmpty()){
+					if(difference == 0 || Math.abs(difference) == Math.abs(impactDifference)){
+						assgns.put(G2, Math.abs(difference));
 						visited.add(G2);
 					}
-					helper_fullSearch(chosenNode, G1, G2, difference, assgns, visited);
+					helper_greedySearch(chosenNode, G1, G2, difference, assgns, visited);
 				}
 				else{
 					G1.add(chosenNode);
 					G2.remove(chosenNode);
 					visited.add(G2);
-					assgns.put(G2, impactDifference);
+					assgns.put(G2, Math.abs(impactDifference));
 				}
 			}
 		}
@@ -294,24 +307,26 @@ public class loadBalancing extends groupCentrality {
 			Set<String> g2 = new HashSet<String>(groupSet.size());// empty set
 			
 			// special case
-			long differenceTop = Math.abs(getGroupImpact(g1) - getGroupImpact(g2));
+			long differenceTop = getGroupImpact(g1);
 			if(differenceTop == 0){
 				assgns.put(g2, differenceTop);
 				visited.add(g2);
 			}
 			
 			Iterator<String> itr = g1.iterator();
-			HashMap<String, Long> sumOfImpact = new HashMap<String, Long>(g1.size());
-
+			HashMap<String, Long> newDifference = new HashMap<String, Long>(g1.size());
+			HashMap<String, Long> newDifferenceAbs = new HashMap<String, Long>(g1.size());
 			while(itr.hasNext()){
 				String currNode = itr.next();
 				Set<String> tempG1 = new HashSet<String>(g1);
 				tempG1.remove(currNode);
 				// heuristic: sumOfImpact
-				sumOfImpact.put(currNode, getSumOfConditionalImpactOfG1G2(currNode, tempG1, g2));
+				long temp = getSumOfConditionalImpactOfG1G2(currNode, tempG1, g2);
+				newDifference.put(currNode, differenceTop-temp);
+				newDifferenceAbs.put(currNode, Math.abs(differenceTop-temp));
 			}
 			
-			List<String> nodesWithMaxOfSumOfImpact = getKeysWithMaxValuesFromMap(sumOfImpact);
+			List<String> nodesWithMaxOfSumOfImpact = getKeysWithMinValuesFromMap1(newDifferenceAbs);
 			Iterator<String> itr2 = nodesWithMaxOfSumOfImpact.iterator();
 			
 			while(itr2.hasNext()){
@@ -323,9 +338,10 @@ public class loadBalancing extends groupCentrality {
 
 				if(!visited.contains(G1) && !visited.contains(G2)){
 
-					long difference = Math.abs(getGroupImpact(G1) - getGroupImpact(G2));
-					if(difference == 0 || difference == differenceTop){
-						assgns.put(G2, difference);
+//					long difference = Math.abs(getGroupImpact(G1) - getGroupImpact(G2));
+					long difference = newDifference.get(theNode);
+					if(difference == 0 || Math.abs(difference) == differenceTop){
+						assgns.put(G2, Math.abs(difference));
 						visited.add(G2);
 						helper_greedySearch(theNode, G1, G2, difference, assgns, visited);
 					}else{
