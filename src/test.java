@@ -38,7 +38,7 @@ public class test {
 			System.out.println("Running Validation Test " + (i+1) + " ...");
 			
 			// bruteForce
-			System.out.println("  Brute-force Method begins.");
+			System.out.println("  Brute-force Method begins...");
 			long beginTime_bruteForce = System.currentTimeMillis();
 			List<Set<String>> assgn_bruteForce = c[i].getGroupAssignment_bruteForce();
 			long totalTime_bruteForce = System.currentTimeMillis() - beginTime_bruteForce;
@@ -57,7 +57,7 @@ public class test {
 			res_bruteForce.add(res0);
 			
 			// greedy
-			System.out.println("  Greedy Method begins.");
+			System.out.println("  Greedy Method begins...");
 			long beginTime_greedy = System.currentTimeMillis();
 			Set<String> assgn_greedy = c[i].getGroupAssignment_greedy();
 			long totalTime_greedy = System.currentTimeMillis() - beginTime_greedy;
@@ -80,7 +80,7 @@ public class test {
 			res_greedy.add(res1);
 			
 			// greedy search
-			System.out.println("  Greedy Search Method begins.");
+			System.out.println("  Greedy Search Method begins...");
 			long beginTime_greedySearch = System.currentTimeMillis();
 			List<Set<String>> assgn_greedySearch = c[i].getGroupAssignment_greedySearch();
 			long totalTime_greedySearch = System.currentTimeMillis() - beginTime_greedySearch;
@@ -112,7 +112,7 @@ public class test {
 			res_greedySearch.add(res2);
 			
 			// full search
-			System.out.println("  Full Search Method begins.");
+			System.out.println("  Full Search Method begins...");
 			long beginTime_fullSearch = System.currentTimeMillis();
 			List<Set<String>> assgn_fullSearch = c[i].getGroupAssignment_fullSearch();
 			long totalTime_fullSearch = System.currentTimeMillis() - beginTime_fullSearch;
@@ -247,7 +247,7 @@ public class test {
 		d[9] = new loadBalancing(generator20.graph, "./data/var_size/source1000.txt", "./data/var_size/destination1000.txt", "./data/var_size/group1000.txt");
 		
 		graphGenerator generator = new graphGenerator("./data/DAG_50_0.4_5.txt", "dag");
-		loadBalancing[] t = new loadBalancing[1];
+		loadBalancing[] t = new loadBalancing[10];
 		t[0] = new loadBalancing(generator.graph, "./data/source50.txt", "./data/destination50.txt", "./data/group50_4.txt");
 		t[1] = new loadBalancing(generator.graph, "./data/source50.txt", "./data/destination50.txt", "./data/group50_5.txt");
 		t[2] = new loadBalancing(generator.graph, "./data/source50.txt", "./data/destination50.txt", "./data/group50_6.txt");
@@ -266,6 +266,10 @@ public class test {
 		showResults();// show first 10
 		
 		validationTest(t);
+		
+		showResults();// show all 20
+		
+		validationTest(d);
 		
 		showResults();// show all 20
 
