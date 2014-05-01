@@ -381,11 +381,11 @@ public class loadBalancing extends groupCentrality {
 
 			if(!visited.contains(G1) && !visited.contains(G2)){ // if the new G1 & G2 are not evaluated, proceed.
 
-				long difference = Math.abs(getGroupImpact(G1) - getGroupImpact(G2));
+				long difference = getGroupImpact(G1) - getGroupImpact(G2);
 				
-				if(difference <= impactDifference && !G1.isEmpty()){
-					if(difference == 0 || difference == impactDifference){
-						assgns.put(G2, difference);
+				if(Math.abs(difference) <= Math.abs(impactDifference) && !G1.isEmpty()){
+					if(difference == 0 || Math.abs(difference) == Math.abs(impactDifference)){
+						assgns.put(G2, Math.abs(difference));
 						visited.add(G2);
 					}
 					helper_fullSearch(chosenNode, G1, G2, difference, assgns, visited);
@@ -394,7 +394,7 @@ public class loadBalancing extends groupCentrality {
 					G1.add(chosenNode);
 					G2.remove(chosenNode);
 					visited.add(G2);
-					assgns.put(G2, impactDifference);
+					assgns.put(G2, Math.abs(impactDifference));
 				}
 			}
 		}
@@ -420,7 +420,7 @@ public class loadBalancing extends groupCentrality {
 			Set<String> g2 = new HashSet<String>(groupSet.size());// empty set
 			
 			// special case
-			long differenceTop = Math.abs(getGroupImpact(g1) - getGroupImpact(g2));
+			long differenceTop = getGroupImpact(g1) - getGroupImpact(g2);
 			if(differenceTop == 0){
 				assgns.put(g2, differenceTop);
 				visited.add(g2);
@@ -436,9 +436,9 @@ public class loadBalancing extends groupCentrality {
 
 				if(!visited.contains(G1) && !visited.contains(G2)){
 
-					long difference = Math.abs(getGroupImpact(G1) - getGroupImpact(G2));
-					if(difference == 0 || difference == differenceTop){
-						assgns.put(G2, difference);
+					long difference = getGroupImpact(G1) - getGroupImpact(G2);
+					if(difference == 0 || Math.abs(difference) == differenceTop){
+						assgns.put(G2, Math.abs(difference));
 						visited.add(G2);
 						helper_fullSearch(theNode, G1, G2, difference, assgns, visited);
 					}else{
