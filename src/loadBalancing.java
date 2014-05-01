@@ -170,11 +170,11 @@ public class loadBalancing extends groupCentrality {
 		
 	}
 	
-	/** This methods returns a list of keys with max values in the map.
-	 * 
-	 * @param map Given map.
-	 * @return Keys with largest integer value.
-	 */
+//	/** This methods returns a list of keys with max values in the map.
+//	 * 
+//	 * @param map Given map.
+//	 * @return Keys with largest integer value.
+//	 */
 //	private static List<String> getKeysWithMaxValuesFromMap(Map<String, Long> map){
 //		List<String> res = new ArrayList<String>();
 //		Collection<Long> valueSet = map.values();
@@ -194,12 +194,12 @@ public class loadBalancing extends groupCentrality {
 		List<String> res = new ArrayList<String>();
 		Collection<Long> valueSet = map.values();
 		long minValue = Collections.min(valueSet);
-		if(minValue < 0){
-			valueSet.remove(minValue);
-		}
-		while(minValue < 0 && !valueSet.isEmpty()){
-			minValue = Collections.min(valueSet);
-		}
+//		if(minValue < 0){
+//			valueSet.remove(minValue);
+//		}
+//		while(minValue < 0 && !valueSet.isEmpty()){
+//			minValue = Collections.min(valueSet);
+//		}
 		for(String entry : map.keySet()){
 			if(map.get(entry).equals(minValue)) res.add(entry);
 		}
@@ -306,7 +306,7 @@ public class loadBalancing extends groupCentrality {
 			Set<String> g1 = new HashSet<String>(groupSet);// full set
 			Set<String> g2 = new HashSet<String>(groupSet.size());// empty set
 			
-			// special case
+			// special case: difference = 0 all the time
 			long differenceTop = getGroupImpact(g1);
 			if(differenceTop == 0){
 				assgns.put(g2, differenceTop);
