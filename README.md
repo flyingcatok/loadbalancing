@@ -29,7 +29,9 @@ You can also modify or/and run  ./src/test/java to check results for yourself.
 
 Reference:
 
-Ishakian, Vatche, Dóra Erdös, Evimaria Terzi, and AzerBestavros. ?A Framework for the Evaluation and Managementof Network Centrality.? In SDM, pp. 427-438. 2012.
+Ishakian, Vatche, Dóra Erdös, Evimaria Terzi, and Azer
+Bestavros. "A Framework for the Evaluation and Management
+of Network Centrality." In SDM, pp. 427-438. 2012.
 
 This project is implemented in Java using Eclipse. I also used a free graph library, JGraphT.
 
