@@ -1,10 +1,12 @@
 import java.io.*;
 import java.util.*;
 
-/** This class contains the test on three algorithms for DAG load balancing problem.
+/** 
+ * 
+ * This class contains the test on three algorithms for DAG load balancing problem.
  * 
  * @author Feiyu Shi
- *
+ * 
  */
 public class test {
 	
@@ -261,42 +263,18 @@ public class test {
 		
 		// tests and results
 		
-		validationTest(c);
+		validationTest(c); // to observe the time complexity with different |E| (number of edges in the graph.)
 	
 		showResults();// show first 10
 		
-		validationTest(t);
+		validationTest(d); // to observe the time complexity with different |V| (number of nodes in the graph.)
 		
-		showResults();// show all 20
+		showResults();// show first 20
 		
-		validationTest(d);
+		validationTest(t); // to observe the time complexity with different k (number of nodes in the group.)
 		
-		showResults();// show all 20
-
+		showResults();// show all 	
 		
-		// baseline method
-//		long beginTime0 = System.currentTimeMillis();
-//		List<Set<String>> assgn0 = a.getGroupAssignment_baseLine();
-//		long totalTime0 = System.currentTimeMillis() - beginTime0;
-//		System.out.println("Total used time for baseline method: " + totalTime0 + "ms");
-//		// for display
-//		System.out.println("Number of possible Assignment: " + assgn0.size());
-//		for (int i = 0; i < assgn0.size(); i++) {
-//			Set<String> groupNodes = new HashSet<String>(a.groupSet);
-//			System.out.println("Assignment " + (i+1) + ": ");
-//			System.out.println("Set " + assgn0.get(i).toString() + " Impact: " + a.getGroupImpact(assgn0.get(i)) + " ");
-//			groupNodes.removeAll(assgn0.get(i));
-//			System.out.println("The other set: " + groupNodes + " Impact: " + a.getGroupImpact(groupNodes));
-//			System.out.println();
-//		}
-		
-		
-		//visualize graph
-//		DOTExporter exporter = new DOTExporter();
-//		String targetDirectory = "results/graph/";
-//		new File(targetDirectory).mkdirs();
-//		exporter.export(new FileWriter(targetDirectory + "evaluation_graph_default.dot"), c.evaluationGraph);
-
 	}
 
 }

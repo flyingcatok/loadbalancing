@@ -16,10 +16,10 @@ public class groupCentrality extends nodeCentrality{
 	
 	/** Constructor with inputs of graph and addresses of files containing the source, destination and the group.
 	 * 
-	 * @param inputGraph 
-	 * @param sourceAddr
-	 * @param destinationAddr
-	 * @param groupAddr
+	 * @param inputGraph Graph.
+	 * @param sourceAddr Address of files containing sources.
+	 * @param destinationAddr Address of files containing destinations.
+	 * @param groupAddr Address of files containing group of nodes.
 	 * @throws IOException
 	 */
 	public groupCentrality(Graph<String, DefaultEdge> inputGraph, String sourceAddr, String destinationAddr, String groupAddr) throws IOException {
@@ -29,10 +29,10 @@ public class groupCentrality extends nodeCentrality{
 	
 	/** Constructor with inputs of graph and sets.
 	 * 
-	 * @param inputGraph
-	 * @param srcSet
-	 * @param dstnSet
-	 * @param grpSet
+	 * @param inputGraph Graph.
+	 * @param srcSet The set of sources.
+	 * @param dstnSet The set of destinations.
+	 * @param grpSet The set of the group.
 	 */
 	public groupCentrality(Graph<String, DefaultEdge> inputGraph, Set<String> srcSet, Set<String> dstnSet, Set<String> grpSet){
 		super(inputGraph, srcSet, dstnSet);

@@ -4,7 +4,13 @@ import java.io.*;
 
 import org.jgrapht.*;
 import org.jgrapht.graph.*;
-
+/**
+ * 
+ * This class generates the graph used in the tests.
+ * 
+ * @author Feiyu Shi
+ * 
+ */
 public class graphGenerator {
 	
 	public Graph<String, DefaultEdge> graph;
@@ -23,6 +29,10 @@ public class graphGenerator {
 		graph = createDirectedGraph();
 	}
 	
+	/** This method creates a toy DAG, used in the development of algorithms.
+	 * 
+	 * @return A 10-node DAG.
+	 */
 	private static DirectedGraph<String, DefaultEdge> createDirectedGraph() {
 		DirectedGraph<String, DefaultEdge> dg =
 	            new DefaultDirectedGraph<String, DefaultEdge>(DefaultEdge.class);
@@ -59,6 +69,12 @@ public class graphGenerator {
 		
 	}
 
+	/** This method create a DAG using parameters from a given file.
+	 * 
+	 * @param addr Address of the provided file.
+	 * @return A DAG.
+	 * @throws IOException
+	 */
 	private static DirectedGraph<String, DefaultEdge> createDirectedGraph(String addr) throws IOException{
 		DirectedGraph<String, DefaultEdge> dg =
 	            new DefaultDirectedGraph<String, DefaultEdge>(DefaultEdge.class);
@@ -107,6 +123,12 @@ public class graphGenerator {
 		return dg;
 	}
 	
+	/** This method creates a undirected graph using parameters from a given file.
+	 * 
+	 * @param addr Address of the file.
+	 * @return A undirected graph.
+	 * @throws IOException
+	 */
 	private static UndirectedGraph<String, DefaultEdge> createUndirectedGraph(String addr) throws IOException{
 		UndirectedGraph<String, DefaultEdge> udg =
 	            new SimpleGraph<String, DefaultEdge>(DefaultEdge.class);

@@ -12,9 +12,9 @@ public class loadBalancing extends groupCentrality {
 	/** Constructor with address of files containing source, destination and group.
 	 * 
 	 * @param inputGraph Input directed graph.
-	 * @param sourceAddr 
-	 * @param destinationAddr
-	 * @param groupAddr
+	 * @param sourceAddr Address of the file containing sources.
+	 * @param destinationAddr Address of the file containing destinations.
+	 * @param groupAddr Address of the file containing the group of nodes.
 	 * @throws IOException
 	 */
 	public loadBalancing(Graph<String, DefaultEdge> inputGraph,
@@ -25,10 +25,10 @@ public class loadBalancing extends groupCentrality {
 	
 	/** Constructor with sets of sources, destinations and the group.
 	 * 
-	 * @param inputGraph
-	 * @param srcSet
-	 * @param dstnSet
-	 * @param grpSet
+	 * @param inputGraph Graph.
+	 * @param srcSet The set of sources.
+	 * @param dstnSet The set of destinations.
+	 * @param grpSet The set of the group.
 	 */
 	public loadBalancing(Graph<String, DefaultEdge> inputGraph, Set<String> srcSet, Set<String> dstnSet, Set<String> grpSet){
 		super(inputGraph, srcSet, dstnSet, grpSet);
@@ -170,36 +170,15 @@ public class loadBalancing extends groupCentrality {
 		
 	}
 	
-//	/** This methods returns a list of keys with max values in the map.
-//	 * 
-//	 * @param map Given map.
-//	 * @return Keys with largest integer value.
-//	 */
-//	private static List<String> getKeysWithMaxValuesFromMap(Map<String, Long> map){
-//		List<String> res = new ArrayList<String>();
-//		Collection<Long> valueSet = map.values();
-//		long minValue = Collections.max(valueSet);
-//		for(String entry : map.keySet()){
-//			if(map.get(entry).equals(minValue)) res.add(entry);
-//		}
-//		return res;
-//	}
-	
 	/** This methods returns a list of keys with min values in the map. The key type is String.
 	 * 
-	 * @param map
-	 * @return
+	 * @param map given map.
+	 * @return the list of keys with min values in the map.
 	 */
 	private static List<String> getKeysWithMinValuesFromMap1(Map<String, Long> map){
 		List<String> res = new ArrayList<String>();
 		Collection<Long> valueSet = map.values();
 		long minValue = Collections.min(valueSet);
-//		if(minValue < 0){
-//			valueSet.remove(minValue);
-//		}
-//		while(minValue < 0 && !valueSet.isEmpty()){
-//			minValue = Collections.min(valueSet);
-//		}
 		for(String entry : map.keySet()){
 			if(map.get(entry).equals(minValue)) res.add(entry);
 		}
@@ -208,8 +187,8 @@ public class loadBalancing extends groupCentrality {
 	
 	/** This methods returns a list of keys with min values in the map. The key type is Set<String>.
 	 * 
-	 * @param map
-	 * @return
+	 * @param map given map.
+	 * @return the list of keys with min values in the map.
 	 */
 	private static List<Set<String>> getKeysWithMinValuesFromMap(Map<Set<String>, Long> map){
 		List<Set<String>> res = new ArrayList<Set<String>>();
