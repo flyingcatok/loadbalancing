@@ -5,6 +5,7 @@ CAS CS591 Advanced Topics in Data Mining, Spring 2014 @ Boston University
 ----------------------------------------------------------------------------------------------------------
 
 Author: Feiyu Shi
+
 Supervised by: Dóra Erdös, Dr. Evimaria Terzi
 
 Course website: [link](http://www.cs.bu.edu/~evimaria/cs591-14.html).
@@ -37,6 +38,6 @@ The library dependencies will be set up automatically. If not, right click the p
 Build Path -> Configure Build Path. Then add all .jar files in ./lib to the library.
 
 This code is only for study and research use.
-If you have any questions, please contact me via fshi@bu.edu.
+If you have any questions, please contact me via fshi @ bu.edu.
 
 May 9, 2014
