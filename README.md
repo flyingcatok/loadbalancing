@@ -27,6 +27,10 @@ and compared them to two baseline methods:
 Algorithms and results are showed in ./doc/poster.pdf or ./doc/slides.pdf. 
 You can also modify or/and run  ./src/test/java to check results for yourself.
 
+Reference:
+
+Ishakian, Vatche, Dóra Erdös, Evimaria Terzi, and AzerBestavros. ?A Framework for the Evaluation and Managementof Network Centrality.? In SDM, pp. 427-438. 2012.
+
 This project is implemented in Java using Eclipse. I also used a free graph library, JGraphT.
 
 How to use the code:
@@ -39,5 +43,7 @@ Build Path -> Configure Build Path. Then add all .jar files in ./lib to the libr
 
 This code is only for study and research use.
 If you have any questions, please contact me via fshi @ bu.edu.
+
+Thank you!
 
 May 9, 2014
