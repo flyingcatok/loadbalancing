@@ -6,7 +6,7 @@ CAS CS591 Advanced Topics in Data Mining, Spring 2014 @ Boston University
 
 Author: Feiyu Shi
 
-Supervised by: Dóra Erdös, Dr. Evimaria Terzi
+Supervised by: DÃ³ra ErdÃ¶s, Dr. Evimaria Terzi
 
 Course website: [link](http://www.cs.bu.edu/~evimaria/cs591-14.html).
 
@@ -25,11 +25,11 @@ and compared them to two baseline methods:
 * Full Search
 
 Algorithms and results are showed in ./doc/poster.pdf or ./doc/slides.pdf. 
-You can also modify or/and run  ./src/test/java to check results for yourself.
+You can also modify and run  ./src/test/java to check results for yourself.
 
 Reference:
 
-Ishakian, Vatche, Dóra Erdös, Evimaria Terzi, and Azer
+Ishakian, Vatche, DÃ³ra ErdÃ¶s, Evimaria Terzi, and Azer
 Bestavros. "A Framework for the Evaluation and Management
 of Network Centrality." In SDM, pp. 427-438. 2012.
 
