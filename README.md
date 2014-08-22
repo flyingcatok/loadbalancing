@@ -35,14 +35,10 @@ of Network Centrality." In SDM, pp. 427-438. 2012.
 
 This project is implemented in Java using Eclipse. I also used a free graph library, JGraphT.
 
-How to use the code:
+How to load the project in Eclipse:
 
-In Eclipse:
-
-File -> New -> Java Project. Then change the project location to where this code is downloaded.
-The library dependencies will be set up automatically. If not, right click the project name and select
-Build Path -> Configure Build Path. Then add all .jar files in ./lib to the library.
-
+File -> Import -> Existing Projects into Workspace -> Select root directory (loadbalancing) -> Finish.
+ 
 This code is only for study and research use.
 If you have any questions, please contact me via fshi @ bu.edu.
 
